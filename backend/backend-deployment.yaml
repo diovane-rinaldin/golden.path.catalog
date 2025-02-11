@@ -1,0 +1,77 @@
+# backend-deployment.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: golden-path-secrets
+type: Opaque
+stringData:
+  JWT_SECRET: your-secret-key-here
+  AWS_ACCESS_KEY_ID: your-access-key
+  AWS_SECRET_ACCESS_KEY: your-secret-key
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: golden-path-config
+data:
+  AWS_REGION: us-east-1
+  DYNAMODB_ENDPOINT: https://dynamodb.us-east-1.amazonaws.com
+  S3_BUCKET_NAME: golden_path_images
+  S3_BUCKET_URL: https://golden_path_images.s3.amazonaws.com
+  KMS_KEY_ID: alias/golden_path_api_auth
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: golden-path-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: golden-path-backend
+  template:
+    metadata:
+      labels:
+        app: golden-path-backend
+    spec:
+      containers:
+      - name: backend
+        image: golden-path-backend:latest
+        ports:
+        - containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: golden-path-config
+        - secretRef:
+            name: golden-path-secrets
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: golden-path-backend
+spec:
+  selector:
+    app: golden-path-backend
+  ports:
+  - port: 80
+    targetPort: 8080
+  type: ClusterIP
