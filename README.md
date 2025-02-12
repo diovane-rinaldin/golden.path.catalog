@@ -92,6 +92,34 @@ terraform plan
 terraform apply
 ```
 
+Caso precise instalar o Terraform
+```bash
+sudo yum install -y yum-utils
+sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
+sudo yum -y install terraform
+```
+
+**Problemas conhecidos**
+
+Eventualmente ao criar o bucket pode haver um erro a respeito das políticas públicas
+
+```bash
+│ Error: putting S3 Bucket (golden-path-images) Policy: operation error S3: PutBucketPolicy, https response error StatusCode: 403, RequestID: G1XC8S177HW5ETQ1, HostID: 9cKOXV0Pp6D+g62z5EhsosCoqAAkQkNz4Yrh1WcN7RlGT8wCXTQKRV3I+XxdSkk91WxODPvXY2I=, api error AccessDenied: User: arn:aws:iam::948052180351:root is not authorized to perform: s3:PutBucketPolicy on resource: "arn:aws:s3:::golden-path-images" because public policies are blocked by the BlockPublicPolicy block public access setting.
+│ 
+│   with aws_s3_bucket_policy.public_read,
+│   on main.tf line 108, in resource "aws_s3_bucket_policy" "public_read":
+│  108: resource "aws_s3_bucket_policy" "public_read" {
+│ 
+╵
+```
+Para corrigir, crie o bucket manualmente e execute novamente o `terraform apply`
+```bash
+aws s3api create-bucket --bucket golden-path-images --region us-east-1
+aws s3api get-public-access-block --bucket golden-path-images
+aws s3api delete-public-access-block --bucket golden-path-images
+terraform apply
+```
+
 3. Guarde os outputs gerados para configurar as aplicações:
 ```bash
 terraform output
