@@ -4,7 +4,7 @@ provider "aws" {
 
 # DynamoDB Tables
 resource "aws_dynamodb_table" "technology" {
-  name           = "${var.project_name}_technology"
+  name           = "${var.project_name}-technology"
   billing_mode   = "PAY_PER_REQUEST"
   hash_key       = "id"
   
@@ -26,7 +26,7 @@ resource "aws_dynamodb_table" "technology" {
 }
 
 resource "aws_dynamodb_table" "components" {
-  name           = "${var.project_name}_components"
+  name           = "${var.project_name}-components"
   billing_mode   = "PAY_PER_REQUEST"
   hash_key       = "id"
   
@@ -59,7 +59,7 @@ resource "aws_dynamodb_table" "components" {
 }
 
 resource "aws_dynamodb_table" "services" {
-  name           = "${var.project_name}_services"
+  name           = "${var.project_name}-services"
   billing_mode   = "PAY_PER_REQUEST"
   hash_key       = "id"
   
@@ -129,13 +129,13 @@ resource "aws_kms_key" "api_auth" {
 }
 
 resource "aws_kms_alias" "api_auth" {
-  name          = "alias/${var.project_name}_api_auth"
+  name          = "alias/${var.project_name}-api-auth"
   target_key_id = aws_kms_key.api_auth.key_id
 }
 
 # IAM Role for Backend Service
 resource "aws_iam_role" "backend_service" {
-  name = "${var.project_name}_backend_service"
+  name = "${var.project_name}-backend-service"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -153,7 +153,7 @@ resource "aws_iam_role" "backend_service" {
 
 # IAM Policy for Backend Service
 resource "aws_iam_role_policy" "backend_service" {
-  name = "${var.project_name}_backend_service_policy"
+  name = "${var.project_name}-backend-service-policy"
   role = aws_iam_role.backend_service.id
 
   policy = jsonencode({

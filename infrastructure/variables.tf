@@ -7,13 +7,13 @@ variable "aws_region" {
 variable "project_name" {
   description = "Project name prefix for resources"
   type        = string
-  default     = "golden_path"
+  default     = "golden-path"
 }
 
 variable "bucket_name" {
   description = "Name for the S3 bucket"
   type        = string
-  default     = "golden_path_images"
+  default     = "golden-path-images"
 }
 
 variable "kms_description" {
