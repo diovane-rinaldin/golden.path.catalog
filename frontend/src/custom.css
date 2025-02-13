@@ -1,0 +1,124 @@
+body {
+  background-color: #f0f0f0;
+}
+
+.app-container {
+  display: flex;
+}
+
+/* Navegação */
+.nav-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 250px;
+  background-color: #333;
+  color: white;
+  padding-top: 20px;
+  overflow-y: auto;
+}
+
+.nav-menu {
+  background-color: #2d3748; /* Cor de fundo do menu */
+  color: white;
+  width: 250px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.nav-menu .menu-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 30px;
+}
+
+.nav-menu ul {
+  padding-left: 0;
+  list-style-type: none;
+}
+
+.nav-menu ul li {
+  margin-bottom: 12px;
+}
+
+.nav-menu a,
+.nav-menu button {
+  width: 100%;
+  padding: 12px;
+  text-align: left;
+  border-radius: 8px;
+  color: white;
+  background-color: #4a5568; /* Cor de fundo dos links */
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.nav-menu a:hover,
+.nav-menu button:hover {
+  background-color: #2b6cb0; /* Cor de fundo ao passar o mouse */
+}
+
+.nav-menu .submenu {
+  padding-left: 20px;
+}
+
+.content-container {
+  margin-left: 250px; /* Deixe espaço para a navegação fixada */
+  padding: 20px;
+  flex-grow: 1;
+}
+
+.dashboard-container {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* estilo para exibição de listas */
+.base-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  width: 80%;
+}
+
+.base-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid black;
+  padding: 10px;
+  background-color: white;
+  width: 100%;
+  max-width: 300px;
+  text-align: center;
+}
+
+.base-icon {
+  width: 40px;
+  height: 40px;
+  margin-bottom: 8px;
+}
+
+.base-button {
+  display: inline-block;
+  background-color: #4a4a4a;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: bold;
+  margin-top: 8px;
+}
+
+.base-description {
+  border: 0px;
+  padding: 5px;
+  margin-top: 8px;
+}

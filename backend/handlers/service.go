@@ -113,6 +113,7 @@ func (h *ServiceHandler) ListByComponent(c *gin.Context) {
 			Description:     item["description"].(*types.AttributeValueMemberS).Value,
 			ImageURL:        item["image_url"].(*types.AttributeValueMemberS).Value,
 			ServiceCloudURL: item["service_cloud_url"].(*types.AttributeValueMemberS).Value,
+			CloudProvider:   item["cloud_provider"].(*types.AttributeValueMemberS).Value,
 		}
 		services = append(services, service)
 	}
@@ -189,11 +190,13 @@ func (h *ServiceHandler) getByName(name string, c *gin.Context) (*models.Service
 	if len(result.Items) > 0 {
 		item := result.Items[0]
 		service := models.Service{
-			ID:          item["id"].(*types.AttributeValueMemberS).Value,
-			ComponentID: item["component_id"].(*types.AttributeValueMemberS).Value,
-			Name:        item["name"].(*types.AttributeValueMemberS).Value,
-			Description: item["description"].(*types.AttributeValueMemberS).Value,
-			ImageURL:    item["image_url"].(*types.AttributeValueMemberS).Value,
+			ID:              item["id"].(*types.AttributeValueMemberS).Value,
+			ComponentID:     item["component_id"].(*types.AttributeValueMemberS).Value,
+			Name:            item["name"].(*types.AttributeValueMemberS).Value,
+			Description:     item["description"].(*types.AttributeValueMemberS).Value,
+			ImageURL:        item["image_url"].(*types.AttributeValueMemberS).Value,
+			CloudProvider:   item["cloud_provider"].(*types.AttributeValueMemberS).Value,
+			ServiceCloudURL: item["service_cloud_url"].(*types.AttributeValueMemberS).Value,
 		}
 		return &service, nil
 	}

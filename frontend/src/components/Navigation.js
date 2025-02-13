@@ -1,64 +1,113 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import '../custom.css';  // Importando o CSS
 
 export default function Navigation() {
   const location = useLocation();
   const { logout } = useAuth();
 
+  // Estados para controlar o menu sanfona
+  const [isTecnologiasOpen, setIsTecnologiasOpen] = useState(false);
+  const [isComponentesOpen, setIsComponentesOpen] = useState(false);
+  const [isServicosOpen, setIsServicosOpen] = useState(false);
+
+  // Função para alternar a visibilidade das seções do menu
+  const toggleMenu = (menu) => {
+    if (menu === 'tecnologias') {
+      setIsTecnologiasOpen(!isTecnologiasOpen);
+    } else if (menu === 'componentes') {
+      setIsComponentesOpen(!isComponentesOpen);
+    } else if (menu === 'servicos') {
+      setIsServicosOpen(!isServicosOpen);
+    }
+  };
+
   return (
-    <nav className="bg-white shadow-lg">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="flex justify-between h-16">
-          <div className="flex">
-            <Link to="/" className="flex-shrink-0 flex items-center">
-              <span className="text-xl font-bold text-gray-800">Golden Path Portal</span>
-            </Link>
-          </div>
+    <div className="nav-container">
+      {/* Menu fixo à esquerda */}
+      <nav className="nav-menu">
+        <div className="menu-title">
+          <Link to="/" className="text-2xl font-bold">
+            Golden Path Portal
+          </Link>
+        </div>
+        
+        {/* Menu Accordion */}
+        <ul>
+          <li>
+            <button onClick={() => toggleMenu('tecnologias')} className="menu-button">
+              Tecnologias
+            </button>
+            {isTecnologiasOpen && (
+              <ul className="submenu">
+                <li>
+                  <Link to="/" className={`submenu-item ${location.pathname === '/' ? 'active' : ''}`}>
+                    Lista
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/technology" className={`submenu-item ${location.pathname === '/technology' ? 'active' : ''}`}>
+                    Nova
+                  </Link>
+                </li>
+              </ul>
+            )}
+          </li>
 
-          <div className="flex items-center">
-            <Link
-              to="/technology/new"
-              className={`px-3 py-2 rounded-md text-sm font-medium ${
-                location.pathname === '/technology/new'
-                  ? 'bg-gray-900 text-white'
-                  : 'text-gray-700 hover:bg-gray-100'
-              }`}
-            >
-              New Technology
-            </Link>
+          <li>
+            <button onClick={() => toggleMenu('componentes')} className="menu-button">
+              Componentes
+            </button>
+            {isComponentesOpen && (
+              <ul className="submenu">
+                <li>
+                  <Link to="/component/new" className={`submenu-item ${location.pathname === '/component/new' ? 'active' : ''}`}>
+                    New Component
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/components" className={`submenu-item ${location.pathname === '/components' ? 'active' : ''}`}>
+                    View Components
+                  </Link>
+                </li>
+              </ul>
+            )}
+          </li>
 
-            <Link
-              to="/component/new"
-              className={`ml-4 px-3 py-2 rounded-md text-sm font-medium ${
-                location.pathname === '/component/new'
-                  ? 'bg-gray-900 text-white'
-                  : 'text-gray-700 hover:bg-gray-100'
-              }`}
-            >
-              New Component
-            </Link>
+          <li>
+            <button onClick={() => toggleMenu('servicos')} className="menu-button">
+              Serviços
+            </button>
+            {isServicosOpen && (
+              <ul className="submenu">
+                <li>
+                  <Link to="/service/new" className={`submenu-item ${location.pathname === '/service/new' ? 'active' : ''}`}>
+                    New Service
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/services" className={`submenu-item ${location.pathname === '/services' ? 'active' : ''}`}>
+                    View Services
+                  </Link>
+                </li>
+              </ul>
+            )}
+          </li>
 
-            <Link
-              to="/service/new"
-              className={`ml-4 px-3 py-2 rounded-md text-sm font-medium ${
-                location.pathname === '/service/new'
-                  ? 'bg-gray-900 text-white'
-                  : 'text-gray-700 hover:bg-gray-100'
-              }`}
-            >
-              New Service
-            </Link>
-
-            <button
-              onClick={logout}
-              className="ml-4 px-3 py-2 rounded-md text-sm font-medium text-red-600 hover:bg-red-100"
-            >
+          {/* Logout Button */}
+          <li>
+            <button onClick={logout} className="menu-button logout-button">
               Logout
             </button>
-          </div>
-        </div>
+          </li>
+        </ul>
+      </nav>
+
+      {/* Conteúdo principal */}
+      <div className="content-container">
+        {/* Conteúdo principal do seu app aqui */}
       </div>
-    </nav>
+    </div>
   );
 }

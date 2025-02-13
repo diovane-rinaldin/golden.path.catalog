@@ -1,0 +1,13 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Launch Chrome against localhost",
+        "type": "chrome",
+        "request": "launch",
+        "url": "http://localhost:3000",  // A URL do seu app React
+        "webRoot": "${workspaceFolder}/src"
+      }
+    ]
+  }
+  

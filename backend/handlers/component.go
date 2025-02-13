@@ -147,7 +147,7 @@ func (h *ComponentHandler) List(c *gin.Context) {
 	c.JSON(http.StatusOK, components)
 }
 
-func (h *ComponentHandler) Get(c *gin.Context) {
+func (h *ComponentHandler) GetByName(c *gin.Context) {
 	comp, _ := h.getByName(c.Param("name"), c)
 	if comp == nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Componente não encontrado"})
@@ -155,6 +155,43 @@ func (h *ComponentHandler) Get(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, comp)
+}
+
+func (h *ComponentHandler) GetById(c *gin.Context) {
+	id := c.Param("id")
+	if id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "O parâmetro Id deve ser informado"})
+		return
+	}
+
+	result, err := h.db.GetItem(context.TODO(), &dynamodb.GetItemInput{
+		TableName: aws.String(models.ComponentsTable),
+		Key: map[string]types.AttributeValue{
+			"id": &types.AttributeValueMemberS{Value: id},
+		},
+	})
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao buscar o componente"})
+		log.Panic(err.Error())
+		return
+	}
+
+	// Verifica se o item foi encontrado
+	if result.Item == nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Componente não encontrado"})
+		return
+	}
+
+	component := models.Component{
+		ID:           result.Item["id"].(*types.AttributeValueMemberS).Value,
+		TechnologyID: result.Item["technology_id"].(*types.AttributeValueMemberS).Value,
+		Name:         result.Item["name"].(*types.AttributeValueMemberS).Value,
+		Description:  result.Item["description"].(*types.AttributeValueMemberS).Value,
+		ImageURL:     result.Item["image_url"].(*types.AttributeValueMemberS).Value,
+	}
+
+	c.JSON(http.StatusOK, component)
 }
 
 func (h *ComponentHandler) getByName(name string, c *gin.Context) (*models.Component, error) {

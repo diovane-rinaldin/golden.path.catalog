@@ -11,7 +11,7 @@ export default function ComponentList() {
     const fetchData = async () => {
       try {
         const [techResponse, componentsResponse] = await Promise.all([
-          api.get(`/api/technology/${id}`),
+          api.get(`/api/technology/id/${id}`),
           api.get(`/api/component/technology/${id}`)
         ]);
         
@@ -30,29 +30,18 @@ export default function ComponentList() {
   }
 
   return (
-    <div>
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold">{technology.name} Components</h2>
-        <p className="text-gray-600">{technology.description}</p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {components.map((component) => (
-          <Link
-            key={component.id}
-            to={`/component/${component.id}/services`}
-            className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
-          >
-            <img
-              src={component.image_url}
-              alt={component.name}
-              className="w-24 h-24 mx-auto mb-4 object-contain"
-            />
-            <h3 className="text-xl font-semibold text-center">{component.name}</h3>
-            <p className="text-gray-600 text-center mt-2">{component.description}</p>
-          </Link>
-        ))}
-      </div>
-    </div>
+    <div className="dashboard-container">
+          <div className="base-container">
+            {components.map((comp) => (
+              <div key={comp.id} className="base-card">
+                <img src={comp.image_url} alt={comp.name} className="base-icon" />
+                <Link to={`/component/${comp.id}/services`} className="base-button">
+                  {comp.name}
+                </Link>
+                <p className="base-description">{comp.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
   );
 }

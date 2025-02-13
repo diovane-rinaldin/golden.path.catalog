@@ -74,7 +74,7 @@ func (h *TechnologyHandler) Create(c *gin.Context) {
 	}
 }
 
-func (h *TechnologyHandler) Get(c *gin.Context) {
+func (h *TechnologyHandler) GetByName(c *gin.Context) {
 	tech, _ := h.getByName(c.Param("name"), c)
 	if tech == nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Tecnologia não encontrada"})
@@ -83,9 +83,45 @@ func (h *TechnologyHandler) Get(c *gin.Context) {
 	c.JSON(http.StatusOK, tech)
 }
 
+func (h *TechnologyHandler) GetById(c *gin.Context) {
+	id := c.Param("id")
+	if id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "O parâmetro Id deve ser informado"})
+		return
+	}
+
+	result, err := h.db.GetItem(context.TODO(), &dynamodb.GetItemInput{
+		TableName: aws.String(models.TechnologyTable),
+		Key: map[string]types.AttributeValue{
+			"id": &types.AttributeValueMemberS{Value: id},
+		},
+	})
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao buscar tecnologia"})
+		log.Panic(err.Error())
+		return
+	}
+
+	// Verifica se o item foi encontrado
+	if result.Item == nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Tecnologia não encontrada"})
+		return
+	}
+
+	technology := models.Technology{
+		ID:          result.Item["id"].(*types.AttributeValueMemberS).Value,
+		Name:        result.Item["name"].(*types.AttributeValueMemberS).Value,
+		Description: result.Item["description"].(*types.AttributeValueMemberS).Value,
+		ImageURL:    result.Item["image_url"].(*types.AttributeValueMemberS).Value,
+	}
+
+	c.JSON(http.StatusOK, technology)
+}
+
 func (h *TechnologyHandler) getByName(name string, c *gin.Context) (*models.Technology, error) {
 	if name == "" {
-		return nil, fmt.Errorf("o parâmetro nome deve ser informado")
+		return nil, fmt.Errorf("O parâmetro nome deve ser informado")
 	}
 
 	result, err := h.db.Query(context.TODO(), &dynamodb.QueryInput{

@@ -13,9 +13,12 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <div className="min-h-screen bg-gray-100">
+        <div className="app-container">
+          {/* Menu de Navegação Fixo */}
           <Navigation />
-          <main className="container mx-auto px-4 py-8">
+          
+          {/* Área de Conteúdo Central */}
+          <main className="content-container">
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/technology/new" element={<TechnologyForm />} />
