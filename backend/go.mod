@@ -3,12 +3,14 @@ module github.com/diovane-rinaldin/golden.path.catalog/backend
 go 1.23.6
 
 require (
+	github.com/aws/aws-sdk-go-v2 v1.36.1
 	github.com/aws/aws-sdk-go-v2/config v1.29.6
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.40.1
 	github.com/aws/aws-sdk-go-v2/service/kms v1.37.18
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.76.1
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.10.0
+	github.com/google/uuid v1.6.0
 	github.com/joho/godotenv v1.5.1
 	go.opentelemetry.io/otel v1.34.0
 	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.34.0
@@ -16,7 +18,6 @@ require (
 )
 
 require (
-	github.com/aws/aws-sdk-go-v2 v1.36.1 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.6.8 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.59 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.16.28 // indirect
@@ -45,7 +46,6 @@ require (
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.20.0 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.7 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect

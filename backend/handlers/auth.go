@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"net/http"
 	"os"
 	"time"
 
@@ -25,7 +26,7 @@ func (h *AuthHandler) Authenticate(c *gin.Context) {
 	}
 
 	if err := c.BindJSON(&creds); err != nil {
-		c.JSON(400, gin.H{"error": "Invalid credentials format"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Credenciais em formato inválido"})
 		return
 	}
 
@@ -39,9 +40,9 @@ func (h *AuthHandler) Authenticate(c *gin.Context) {
 
 	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
 	if err != nil {
-		c.JSON(500, gin.H{"error": "Could not generate token"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Não foi possível gerar o token"})
 		return
 	}
 
-	c.JSON(200, models.AuthResponse{Token: tokenString})
+	c.JSON(http.StatusOK, models.AuthResponse{Token: tokenString})
 }

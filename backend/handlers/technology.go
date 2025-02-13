@@ -1,7 +1,16 @@
 package handlers
 
 import (
+	"context"
+	"fmt"
+	"log"
+	"net/http"
+
+	"github.com/google/uuid"
+
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
+	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"github.com/diovane-rinaldin/golden.path.catalog/backend/models"
 	"github.com/gin-gonic/gin"
 )
@@ -17,41 +26,170 @@ func NewTechnologyHandler(db *dynamodb.Client) *TechnologyHandler {
 func (h *TechnologyHandler) Create(c *gin.Context) {
 	var tech models.Technology
 	if err := c.BindJSON(&tech); err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Formato de dados inválido"})
 		return
 	}
 
-	// Save to DynamoDB
-	// ... DynamoDB put logic ...
+	if tech.Name == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "O nome da tecnologia é obrigatório"})
+		return
+	}
+	if tech.ImageURL == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "A URL da imagem da tecnologia é obrigatória"})
+		return
+	}
 
-	c.JSON(201, tech)
+	exist, err := h.getByName(tech.Name, c)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		log.Panic(err.Error())
+		return
+	}
+
+	if exist == nil {
+		tech.ID = uuid.New().String()
+
+		item := map[string]types.AttributeValue{
+			"id":          &types.AttributeValueMemberS{Value: tech.ID},
+			"name":        &types.AttributeValueMemberS{Value: tech.Name},
+			"description": &types.AttributeValueMemberS{Value: tech.Description},
+			"image_url":   &types.AttributeValueMemberS{Value: tech.ImageURL},
+		}
+
+		_, err := h.db.PutItem(context.TODO(), &dynamodb.PutItemInput{
+			TableName: aws.String(models.TechnologyTable),
+			Item:      item,
+		})
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Ocorreu um erro ao salvar a tecnologia"})
+			log.Panic(err.Error())
+			return
+		}
+
+		c.JSON(http.StatusCreated, tech)
+	} else {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "A tecnologia já existe"})
+		return
+	}
 }
 
 func (h *TechnologyHandler) Get(c *gin.Context) {
-	name := c.Param("name")
+	tech, _ := h.getByName(c.Param("name"), c)
+	if tech == nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Tecnologia não encontrada"})
+		return
+	}
+	c.JSON(http.StatusOK, tech)
+}
 
-	// Get from DynamoDB
-	// ... DynamoDB get logic ...
+func (h *TechnologyHandler) getByName(name string, c *gin.Context) (*models.Technology, error) {
+	if name == "" {
+		return nil, fmt.Errorf("o parâmetro nome deve ser informado")
+	}
 
-	c.JSON(200, tech)
+	result, err := h.db.Query(context.TODO(), &dynamodb.QueryInput{
+		TableName:              aws.String(models.TechnologyTable),
+		IndexName:              aws.String("name-index"),
+		KeyConditionExpression: aws.String("#name = :nameValue"),
+		ExpressionAttributeNames: map[string]string{
+			"#name": "name",
+		},
+		ExpressionAttributeValues: map[string]types.AttributeValue{
+			":nameValue": &types.AttributeValueMemberS{Value: name},
+		},
+		Limit: aws.Int32(1),
+	})
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": ""})
+		log.Panic(err.Error())
+		return nil, fmt.Errorf("Ocorreu um erro ao buscar a tecnologia")
+	}
+
+	if len(result.Items) > 0 {
+		item := result.Items[0]
+		technology := models.Technology{
+			ID:          item["id"].(*types.AttributeValueMemberS).Value,
+			Name:        item["name"].(*types.AttributeValueMemberS).Value,
+			Description: item["description"].(*types.AttributeValueMemberS).Value,
+			ImageURL:    item["image_url"].(*types.AttributeValueMemberS).Value,
+		}
+		return &technology, nil
+	}
+	return nil, nil
 }
 
 func (h *TechnologyHandler) List(c *gin.Context) {
-	// List from DynamoDB
-	// ... DynamoDB scan logic ...
+	result, err := h.db.Scan(context.TODO(), &dynamodb.ScanInput{
+		TableName: aws.String(models.TechnologyTable),
+	})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Ocorreu um erro ao buscar as tecnologias"})
+		log.Panic(err.Error())
+		return
+	}
 
-	c.JSON(200, techs)
+	var technologies []models.Technology
+	for _, item := range result.Items {
+		tech := models.Technology{
+			ID:          item["id"].(*types.AttributeValueMemberS).Value,
+			Name:        item["name"].(*types.AttributeValueMemberS).Value,
+			Description: item["description"].(*types.AttributeValueMemberS).Value,
+			ImageURL:    item["image_url"].(*types.AttributeValueMemberS).Value,
+		}
+		technologies = append(technologies, tech)
+	}
+
+	c.JSON(http.StatusOK, technologies)
 }
 
 func (h *TechnologyHandler) Update(c *gin.Context) {
 	var tech models.Technology
 	if err := c.BindJSON(&tech); err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Formato de dados inválido"})
 		return
 	}
 
-	// Update in DynamoDB
-	// ... DynamoDB update logic ...
+	if tech.ID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "É necessário informar o Id da tecnologia a ser atualizada"})
+		return
+	}
+	exist, err := h.getByName(tech.Name, c)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		log.Panic(err.Error())
+		return
+	}
 
-	c.JSON(200, tech)
+	if exist == nil || exist.ID == tech.ID {
+		updateInput := &dynamodb.UpdateItemInput{
+			TableName: aws.String(models.TechnologyTable),
+			Key: map[string]types.AttributeValue{
+				"id": &types.AttributeValueMemberS{Value: tech.ID},
+			},
+			UpdateExpression: aws.String("SET #name = :name, description = :description, image_url = :image_url"),
+			ExpressionAttributeNames: map[string]string{
+				"#name": "name", // Alias para o atributo reservado
+			},
+			ExpressionAttributeValues: map[string]types.AttributeValue{
+				":name":        &types.AttributeValueMemberS{Value: tech.Name},
+				":description": &types.AttributeValueMemberS{Value: tech.Description},
+				":image_url":   &types.AttributeValueMemberS{Value: tech.ImageURL},
+			},
+			ReturnValues: types.ReturnValueUpdatedNew,
+		}
+
+		_, err := h.db.UpdateItem(context.TODO(), updateInput)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Ocorreu um erro ao atualizar a tecnologia"})
+			log.Panic(err.Error())
+			return
+		}
+
+		c.JSON(http.StatusOK, tech)
+	} else {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Uma tecnologia com esse nome já existe"})
+		return
+	}
 }

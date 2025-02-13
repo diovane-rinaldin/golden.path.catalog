@@ -21,6 +21,18 @@ output "kms_key_arn" {
 output "dynamodb_endpoint" {
   value = "https://dynamodb.${var.aws_region}.amazonaws.com"
 }
+
+# A Secret Key só é visível na primeira execução
+output "service_user_access_key" {
+  description = "Access Key for the service user"
+  value       = aws_iam_access_key.service_user_key.id
+}
+
+output "service_user_secret_key" {
+  description = "Secret Key for the service user (only visible on first run)"
+  value       = aws_iam_access_key.service_user_key.secret
+  sensitive   = true
+}
 #Exemplo de saída
 #dynamodb_components_table_arn = "arn:aws:dynamodb:us-east-1:<account-id>:table/golden-path_components"
 #dynamodb_endpoint = "https://dynamodb.us-east-1.amazonaws.com"

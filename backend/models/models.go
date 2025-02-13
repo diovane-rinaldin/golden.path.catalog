@@ -1,5 +1,9 @@
 package models
 
+const ComponentsTable = "golden-path-components"
+const ServicesTable = "golden-path-services"
+const TechnologyTable = "golden-path-technology"
+
 type Technology struct {
 	ID          string `json:"id"`
 	Name        string `json:"name"`

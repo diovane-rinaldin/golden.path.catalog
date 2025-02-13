@@ -90,6 +90,7 @@ cd infrastructure
 terraform init
 terraform plan
 terraform apply
+terraform output -raw service_user_secret_key
 ```
 
 Caso precise instalar o Terraform
@@ -118,6 +119,7 @@ aws s3api create-bucket --bucket golden-path-images --region us-east-1
 aws s3api get-public-access-block --bucket golden-path-images
 aws s3api delete-public-access-block --bucket golden-path-images
 terraform apply
+terraform output -raw service_user_secret_key
 ```
 
 3. Guarde os outputs gerados para configurar as aplicações:

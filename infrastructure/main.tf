@@ -2,6 +2,24 @@ provider "aws" {
   region = var.aws_region
 }
 
+resource "aws_iam_user" "service_user" {
+  name = "${var.project_name}-service-user"
+}
+
+resource "aws_iam_user_policy_attachment" "service_user_dynamodb" {
+  user       = aws_iam_user.service_user.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
+}
+
+resource "aws_iam_user_policy_attachment" "service_user_s3" {
+  user       = aws_iam_user.service_user.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+}
+
+resource "aws_iam_access_key" "service_user_key" {
+  user = aws_iam_user.service_user.name
+}
+
 # DynamoDB Tables
 resource "aws_dynamodb_table" "technology" {
   name           = "${var.project_name}-technology"

@@ -28,7 +28,7 @@ func SetupRoutes(
 	api.POST("/technology", tech.Create)
 	api.GET("/technology", tech.List)
 	api.GET("/technology/:name", tech.Get)
-	api.PUT("/technology/:id", tech.Update)
+	api.PUT("/technology", tech.Update)
 
 	// Component routes
 	comp := handlers.NewComponentHandler(db)
@@ -36,7 +36,7 @@ func SetupRoutes(
 	api.GET("/component", comp.List)
 	api.GET("/component/:name", comp.Get)
 	api.GET("/component/technology/:id", comp.ListByTechnology)
-	api.PUT("/component/:id", comp.Update)
+	api.PUT("/component", comp.Update)
 
 	// Service routes
 	svc := handlers.NewServiceHandler(db)
@@ -44,7 +44,7 @@ func SetupRoutes(
 	api.GET("/service", svc.List)
 	api.GET("/service/:name", svc.Get)
 	api.GET("/service/component/:id", svc.ListByComponent)
-	api.PUT("/service/:id", svc.Update)
+	api.PUT("/service", svc.Update)
 
 	// Image upload route
 	upload := handlers.NewUploadHandler(s3)

@@ -1,2 +1,4 @@
 versionar.sh
 .env
+.vscode
+__debug*

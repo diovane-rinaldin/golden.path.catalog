@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"net/http"
 	"os"
 	"strings"
 
@@ -12,14 +13,14 @@ func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
-			c.JSON(401, gin.H{"error": "Authorization header required"})
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Token de autorização ausente"})
 			c.Abort()
 			return
 		}
 
 		tokenParts := strings.Split(authHeader, " ")
 		if len(tokenParts) != 2 || tokenParts[0] != "Bearer" {
-			c.JSON(401, gin.H{"error": "Invalid authorization header format"})
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Formato inválido do token no header"})
 			c.Abort()
 			return
 		}
@@ -29,7 +30,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		})
 
 		if err != nil || !token.Valid {
-			c.JSON(401, gin.H{"error": "Invalid token"})
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Token inválido"})
 			c.Abort()
 			return
 		}

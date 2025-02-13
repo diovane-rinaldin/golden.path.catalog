@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log"
+	"os"
 
 	"github.com/diovane-rinaldin/golden.path.catalog/backend/utils"
 	"github.com/diovane-rinaldin/golden.path.catalog/backend/views"
@@ -51,5 +52,5 @@ func main() {
 	// Initialize routes
 	views.SetupRoutes(router, dynamoDBClient, kmsClient, s3Client)
 
-	router.Run(":8080")
+	router.Run(os.Getenv("SERVER_PORT"))
 }
